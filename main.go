@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -27,15 +28,21 @@ func postHome(response http.ResponseWriter, request *http.Request) {
 	fmt.Println("Target value:", target)
 
 	//handle body
-	body, err := ioutil.ReadAll(request.Body)
+	reqBody, err := ioutil.ReadAll(request.Body)
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(string(body))
+	var jsonData map[string]interface{}
+	json.Unmarshal(reqBody, &jsonData)
+	fmt.Printf("%#v\n", jsonData)
 
-	// fmt.Println(request.Body)
+	//checking
+	for key, value := range jsonData {
+		fmt.Printf("Key is %v, Value is %v and type of value %T \n", key, value, value)
+	}
+
 	response.Write([]byte("This is the post route"))
 }
 
