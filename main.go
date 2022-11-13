@@ -25,25 +25,51 @@ func postHome(response http.ResponseWriter, request *http.Request) {
 
 	//get query param
 	target := request.URL.Query().Get("target")
-	fmt.Println("Target value:", target)
 
-	//handle body
+	//parse body
 	reqBody, err := ioutil.ReadAll(request.Body)
 
 	if err != nil {
 		panic(err)
 	}
 
-	var jsonData map[string]interface{}
-	json.Unmarshal(reqBody, &jsonData)
-	fmt.Printf("%#v\n", jsonData)
+	//convert the json data into a map
+	var mapData map[string]interface{}
+	json.Unmarshal(reqBody, &mapData)
 
-	//checking
-	for key, value := range jsonData {
-		fmt.Printf("Key is %v, Value is %v and type of value %T \n", key, value, value)
+	fmt.Println("Before update:")
+	printMap(mapData)
+
+	//update the jsonData - pending!!
+	updateData(mapData, target)
+
+	fmt.Println("\n After update:")
+	printMap(mapData)
+
+	//Convert map data to json
+	returnJsonData, error := json.Marshal(mapData)
+	if error != nil {
+		panic(err)
 	}
 
-	response.Write([]byte("This is the post route"))
+	response.Header().Set("Content-Type", "application/json")
+	response.Write(returnJsonData)
+}
+
+func updateData(mapData map[string]interface{}, target string) {
+
+	//testing
+	mapData["k"] = "23"
+
+	//update logic
+
+}
+
+func printMap(mapData map[string]interface{}) {
+
+	for key, value := range mapData {
+		fmt.Printf("Key is %v, Value is %v and type of value %T \n", key, value, value)
+	}
 }
 
 func getHome(response http.ResponseWriter, request *http.Request) {
