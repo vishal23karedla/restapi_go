@@ -38,13 +38,13 @@ func postHome(response http.ResponseWriter, request *http.Request) {
 	json.Unmarshal(reqBody, &mapData)
 
 	// fmt.Println("Before update:")
-	printMap(mapData)
+	// printMap(mapData)
 
 	//update the jsonData - pending!!
 	updateData(mapData, target)
 
 	// fmt.Println("\n After update:")
-	printMap(mapData)
+	// printMap(mapData)
 
 	//Convert map data to json
 	returnJsonData, error := json.Marshal(mapData)
@@ -61,21 +61,46 @@ func updateData(mapData map[string]interface{}, target string) {
 	//delete in the first level
 	delete(mapData, target)
 
-	//incase of nested object
+	//in the case of nested JSON data
 	for _, value := range mapData {
 
 		switch q := value.(type) {
+
+		case []interface{}:
+			fmt.Println("value is of array type")
+			for _, element := range value.([]interface{}) {
+				handleJsonArray(element, target)
+			}
 
 		case map[string]interface{}:
 			fmt.Println("value is of map type")
 			updateData(value.(map[string]interface{}), target)
 
 		default:
-			fmt.Printf("value is of type: %T", q)
+			fmt.Printf("value is of type: %T\n", q)
 		}
 
 	}
 
+}
+
+func handleJsonArray(element interface{}, target string) {
+
+	switch q := element.(type) {
+
+	case []interface{}:
+		fmt.Println("value is of array type")
+		for _, ele := range element.([]interface{}) {
+			handleJsonArray(ele, target)
+		}
+
+	case map[string]interface{}:
+		updateData(element.(map[string]interface{}), target)
+
+	default:
+		fmt.Printf("value is of type: %T\n", q)
+
+	}
 }
 
 func printMap(mapData map[string]interface{}) {
