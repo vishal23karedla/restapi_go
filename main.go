@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Main funcion is running")
+	fmt.Println("\n Main funcion is running")
 
 	r := mux.NewRouter()
 
@@ -37,13 +37,13 @@ func postHome(response http.ResponseWriter, request *http.Request) {
 	var mapData map[string]interface{}
 	json.Unmarshal(reqBody, &mapData)
 
-	fmt.Println("Before update:")
+	// fmt.Println("Before update:")
 	printMap(mapData)
 
 	//update the jsonData - pending!!
 	updateData(mapData, target)
 
-	fmt.Println("\n After update:")
+	// fmt.Println("\n After update:")
 	printMap(mapData)
 
 	//Convert map data to json
@@ -52,16 +52,29 @@ func postHome(response http.ResponseWriter, request *http.Request) {
 		panic(err)
 	}
 
-	response.Header().Set("Content-Type", "application/json")
+	response.Header().Set("Content-Type", "json")
 	response.Write(returnJsonData)
 }
 
 func updateData(mapData map[string]interface{}, target string) {
 
-	//testing
-	mapData["k"] = "23"
+	//delete in the first level
+	delete(mapData, target)
 
-	//update logic
+	//incase of nested object
+	for _, value := range mapData {
+
+		switch q := value.(type) {
+
+		case map[string]interface{}:
+			fmt.Println("value is of map type")
+			updateData(value.(map[string]interface{}), target)
+
+		default:
+			fmt.Printf("value is of type: %T", q)
+		}
+
+	}
 
 }
 
