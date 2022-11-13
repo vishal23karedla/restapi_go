@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -20,10 +21,21 @@ func main() {
 }
 
 func postHome(response http.ResponseWriter, request *http.Request) {
-	//Handle the JSON object
+
+	//get query param
+	target := request.URL.Query().Get("target")
+	fmt.Println("Target value:", target)
+
+	//handle body
+	body, err := ioutil.ReadAll(request.Body)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(body))
 
 	// fmt.Println(request.Body)
-
 	response.Write([]byte("This is the post route"))
 }
 
